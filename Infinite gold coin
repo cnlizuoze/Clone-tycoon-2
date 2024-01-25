@@ -1,0 +1,46 @@
+getgenv().on = not getgenv().on and true or false
+local ind = 0 
+
+
+
+local function fireproximityprompt(Obj, Amount, Skip)
+    if Obj.ClassName == "ProximityPrompt" then 
+        Amount = Amount or 1
+        local PromptTime = Obj.HoldDuration
+        if Skip then 
+            Obj.HoldDuration = 0
+        end
+        for i = 1, Amount do 
+            Obj:InputHoldBegin()
+            if not Skip then 
+                wait(Obj.HoldDuration)
+            end
+            Obj:InputHoldEnd()
+        end
+        Obj.HoldDuration = PromptTime
+    else 
+        error("userdata<ProximityPrompt> expected")
+    end
+end
+
+function FindSelfTycoon()
+   for i,v in pairs(game:GetService("Workspace").Tycoons:GetChildren()) do
+       if (v.Factory.Player.Value == game.Players.LocalPlayer.Name) then
+           return v
+       end
+   end
+end
+while getgenv().on do
+    
+    for i = 0 , 10 , 1 do 
+        task.spawn(function()
+            workspace.Events.DataStores.OreMined:InvokeServer(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool"))
+        end)
+    end
+    ind += 1 
+    if ind % 3 == 0 then 
+        fireproximityprompt(FindSelfTycoon().Factory.Objects.BoughtItems["Ore Refinery"].SpellVortex.Main.Attachment.SellOres, 1, true)
+        game.Players.LocalPlayer.Character.PrimaryPart.CFrame = FindSelfTycoon().Factory.Objects.BoughtItems["Ore Refinery"].SpellVortex.Main.CFrame
+    end
+    game.RunService.RenderStepped:Wait()
+end
